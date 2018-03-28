@@ -253,6 +253,29 @@ public class StepHistory {
         sendEvent(this.mReactContext, "StepHistoryChangedEvent", map);
     }
 
+    public void displayDetailedSteps(long startDate, long endDate) {
+        DateFormat dateFormat = DateFormat.getDateInstance();
+
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .setTimeRange(startDate, endDate, TimeUnit.MILLISECONDS)
+                .read(DataTypes.TYPE_STEP_COUNT_DELTA, DataTypes.AGGREGATE_STEP_COUNT_DELTA)
+                .build();
+
+        DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
+
+        WritableArray map = Arguments.createArray();
+
+        //Used for non-aggregated data
+        if (dataReadResult.getDataSets().size() > 0) {
+            Log.i(TAG, "Number of returned DataSets: " + dataReadResult.getDataSets().size());
+            for (DataSet dataSet : dataReadResult.getDataSets()) {
+                processDataSet(dataSet, map);
+            }
+        }
+
+        sendEvent(this.mReactContext, "StepHistoryChangedEvent", map);
+    }
+
     private void processDataSet(DataSet dataSet, WritableArray map) {
         //Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
 

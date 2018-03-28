@@ -41,9 +41,8 @@ class RNGoogleFit {
         this.eventListeners.push(recordingObserver, distanceObserver)
     }
 
-    //Will be deprecated in future releases
-    getSteps(dayStart, dayEnd) {
-        googleFit.getDailySteps(Date.parse(dayStart), Date.parse(dayEnd));
+    getSteps(startDate, endDate) {
+        googleFit.getSteps(Date.parse(startDate), Date.parse(endDate));
     }
 
     //Will be deprecated in future releases

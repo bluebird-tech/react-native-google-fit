@@ -95,6 +95,11 @@ LifecycleEventListener {
     public void getDailySteps(double startDay, double endDay) {
         mGoogleFitManager.getStepHistory().displayLastWeeksData((long)startDay, (long)endDay);
     }
+
+    @ReactMethod
+    public void getSteps(double startDate, double endDate) {
+        mGoogleFitManager.getStepHistory().displayDetailedSteps((long) startDate, (long) endDate);
+    }
     
     @ReactMethod
     public void getWeeklySteps(double startDate, double endDate) {
