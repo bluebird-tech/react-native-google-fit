@@ -258,7 +258,7 @@ public class StepHistory {
 
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .setTimeRange(startDate, endDate, TimeUnit.MILLISECONDS)
-                .read(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                .read(DataType.TYPE_STEP_COUNT_DELTA)
                 .build();
 
         DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
