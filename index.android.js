@@ -41,8 +41,35 @@ class RNGoogleFit {
         this.eventListeners.push(recordingObserver, distanceObserver)
     }
 
-    getSteps(startDate, endDate) {
-        googleFit.getSteps(Date.parse(startDate), Date.parse(endDate));
+    getDetailedSteps = (options, callback) => {
+        let startDate = options.startDate != undefined ? Date.parse(options.startDate) : (new Date()).setHours(0,0,0,0);
+        let endDate = options.endDate != undefined ? Date.parse(options.endDate) : (new Date()).valueOf();
+
+        googleFit.getDetailedSteps(startDate, endDate,
+            msg => callback(msg, false),
+            (res) => {
+                if (res.length>0) {
+                    callback(false, res, this)
+                } else {
+                    callback("There is no any steps data for this period", false);
+                }
+            }
+        );
+    }
+
+    getSummary = (options, callback) => {
+        let startDate = options.startDate != undefined ? Date.parse(options.startDate) : (new Date()).setHours(0,0,0,0);
+        let endDate = options.endDate != undefined ? Date.parse(options.endDate) : (new Date()).valueOf();
+        googleFit.getSummary(startDate, endDate,
+            msg => callback(msg, false),
+            (res) => {
+                if (res.length>0) {
+                    callback(false, res, this)
+                } else {
+                    callback("There is no any steps data for this period", false);
+                }
+            }
+        );
     }
 
     //Will be deprecated in future releases
@@ -63,17 +90,17 @@ class RNGoogleFit {
         googleFit.getDailyStepCountSamples(startDate, endDate,
             msg => callback(msg, false),
             (res) => {
-              if (res.length>0) {
-                  callback(false, res.map(function(dev) {
-                          let obj = {};
-                          obj.source = dev.source.appPackage + ((dev.source.stream) ? ":" + dev.source.stream : "");
-                          obj.steps = this.buildDailySteps(dev.steps);
-                          return obj;
-                      }, this)
-                  );
-              } else {
-                  callback("There is no any steps data for this period", false);
-              }
+                if (res.length>0) {
+                    callback(false, res.map(function(dev) {
+                            let obj = {};
+                            obj.source = dev.source.appPackage + ((dev.source.stream) ? ":" + dev.source.stream : "");
+                            obj.steps = this.buildDailySteps(dev.steps);
+                            return obj;
+                        }, this)
+                    );
+                } else {
+                    callback("There is no any steps data for this period", false);
+                }
             }
         );
     }
@@ -116,22 +143,22 @@ class RNGoogleFit {
         googleFit.getDailyDistanceSamples( startDate,
             endDate,
             (msg) => {
-            callback(msg, false);
-        },
-        (res) => {
-            if (res.length>0) {
-                res = res.map((el) => {
-                    if (el.distance) {
-                    el.startDate = new Date(el.startDate).toISOString();
-                    el.endDate = new Date(el.endDate).toISOString();
-                    return el;
+                callback(msg, false);
+            },
+            (res) => {
+                if (res.length>0) {
+                    res = res.map((el) => {
+                        if (el.distance) {
+                            el.startDate = new Date(el.startDate).toISOString();
+                            el.endDate = new Date(el.endDate).toISOString();
+                            return el;
+                        }
+                    });
+                    callback(false, res.filter(day => day != undefined));
+                } else {
+                    callback("There is no any distance data for this period", false);
                 }
             });
-                callback(false, res.filter(day => day != undefined));
-            } else {
-                callback("There is no any distance data for this period", false);
-            }
-        });
     }
 
 
@@ -181,25 +208,25 @@ class RNGoogleFit {
         googleFit.getWeightSamples( startDate,
             endDate,
             (msg) => {
-            callback(msg, false);
-        },
-        (res) => {
-            if (res.length>0) {
-                res = res.map((el) => {
-                    if (el.value) {
-                    if (options.unit === 'pound') {
-                        el.value = this.KgToLbs(el.value); //convert back to pounds
-                    }
-                    el.startDate = new Date(el.startDate).toISOString();
-                    el.endDate = new Date(el.endDate).toISOString();
-                    return el;
+                callback(msg, false);
+            },
+            (res) => {
+                if (res.length>0) {
+                    res = res.map((el) => {
+                        if (el.value) {
+                            if (options.unit === 'pound') {
+                                el.value = this.KgToLbs(el.value); //convert back to pounds
+                            }
+                            el.startDate = new Date(el.startDate).toISOString();
+                            el.endDate = new Date(el.endDate).toISOString();
+                            return el;
+                        }
+                    });
+                    callback(false, res.filter(day => day != undefined));
+                } else {
+                    callback("There is no any weight data for this period", false);
                 }
             });
-                callback(false, res.filter(day => day != undefined));
-            } else {
-                callback("There is no any weight data for this period", false);
-            }
-        });
     }
 
     saveWeight = (options, callback) => {
@@ -209,11 +236,11 @@ class RNGoogleFit {
         options.date = Date.parse(options.date);
         googleFit.saveWeight( options,
             (msg) => {
-            callback(msg,false);
-        },
-        (res) => {
-            callback(false,res);
-        });
+                callback(msg,false);
+            },
+            (res) => {
+                callback(false,res);
+            });
     }
 
     deleteWeight = (options, callback) => {
@@ -223,31 +250,31 @@ class RNGoogleFit {
         options.date = Date.parse(options.date);
         googleFit.deleteWeight( options,
             (msg) => {
-            callback(msg, false);
-        },
-        (res) => {
-            callback(false, res);
-        });
+                callback(msg, false);
+            },
+            (res) => {
+                callback(false, res);
+            });
     }
 
     isAvailable(callback) { // true if GoogleFit installed
         googleFit.isAvailable(
             (msg) => {
-            callback(msg, false);
-        },
-        (res) => {
-            callback(false, res);
-        });
+                callback(msg, false);
+            },
+            (res) => {
+                callback(false, res);
+            });
     }
 
     isEnabled(callback) { // true if permission granted
         googleFit.isEnabled(
             (msg) => {
-            callback(msg, false);
-        },
-        (res) => {
-            callback(false, res);
-        });
+                callback(msg, false);
+            },
+            (res) => {
+                callback(false, res);
+            });
     }
 
     observeSteps = (callback) => {
